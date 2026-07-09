@@ -15,9 +15,9 @@ string calc(string str){
 string trypwd (int k,string hash ,int id){
     int* num = new int[k+1];char* str = new char[k+1] ; str[k] = '\0';
     int n = asciis.size();num[k]=0;num[k-1]=id;str[k-1]=asciis[id];
-    for(int i<k-1; i++){
+    for(int i=0;i<k-1;i++){
         num[i] = 0;
-        str[i] =asciis[0]}
+        str[i] =asciis[0];}
     while (1){
             if(calc(str) == hash){return str;}
             num[0]+=1; str[0] = asciis[num[0]];
@@ -32,7 +32,7 @@ string trypwd (int k,string hash ,int id){
 void wrapper(int k, string hash,int id, string* ptr, int* sta) {
 	string result = trypwd(k,hash,id);
 	if(result!=""){
-		*(prt+id)=result;
+		*(ptr+id)=result;
 		*(sta+id)=1;
 	}else{*(sta+id)=2;
 	}
@@ -47,7 +47,7 @@ string thrMan(int k,string hash){
 	for(int i=0;i<n;i++){
 		status[i]=0;
 		ths[i]=thread(wrapper,k,hash,i,results,status);
-		ths[i].join()
+		ths[i].join();
 	}
 	int chk =1;
 	while(chk){
@@ -62,7 +62,7 @@ string thrMan(int k,string hash){
 			}
 		}
 	}
-	return "Nothing!!!"
+	return "Nothing!!!";
 }
 
 int main(){
