@@ -1,0 +1,77 @@
+#include "md5.cpp"
+#include <iostream>
+#include <cstring>
+#include <thread>
+
+using namespace std;
+
+const std::string all_printable_ascii =
+" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+
+
+string calc(string str){return str}
+string trypwd (int k,string hash ,int id){
+    int* num = new int[k+1];char* str = new char[k+1] ; str[k] = '\0';
+    int n = asciis.size();num[k]=0;num[k-1]=id;str[k-1]=asciis[id];
+    for(int i<k-1; i++){
+        num[i] = 0;
+        str[i] =asciis[0]}
+    while (1){
+            if(calc(str) == hash){return str;}
+            num[0]+=1; str[0] = asciis[num[0]];
+            for(int i=0;num[i]>=n;i++){
+                    num[i]=0;num[i+1]+=1;
+                    str[i]=asciis[0];str[i+1]=asciis[num[i+1]];
+                    if(num[k-1]>id){return "";}
+            }  
+    }
+}
+
+void wrapper(int k, string hash,int id, string* ptr, int* sta) {
+	string result = trypwd(k,hash,id);
+	if(result!=""){
+		*(prt+id)=result;
+		*(sta+id)=1;
+	}else{*(sta+id)=2;
+	}
+	
+}
+
+string thrMan(int k,string hash){
+	int n =asciis.size();
+	string* results =new string[n];
+	int* status = new int[n];
+	thread* ths =new thread[n];
+	for(int i=0;i<n;i++){
+		status[i]=0;
+		ths[i]=thread(wrapper,k,hash,i,results,status);
+		ths[i].join()
+	}
+	int chk =1;
+	while(chk){
+		chk=0;
+		for(int i=0;i<n;i++){
+			if(status[i]==1){
+				return results[i];
+				
+			}
+			if(status[i]==0){
+				chk=1;
+			}
+		}
+	}
+	return "Nothing!!!"
+}
+
+int main(){
+    string hash;
+    std::cout<<"hash<<" ;
+    std::cin>>hash;
+    std::cout<<"length<<" ;
+    int length;
+    std::cin>>length;
+    cout<<hash<<"    "<<length<<endl;
+    string ans = thrMan(length,hash);
+    cout<<ans;
+    return 0;
+}
