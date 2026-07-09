@@ -5,7 +5,7 @@
 
 using namespace std;
 
-const std::string all_printable_ascii =
+const std::string asciis =
 " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
 
