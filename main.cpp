@@ -9,7 +9,9 @@ const std::string all_printable_ascii =
 " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
 
-string calc(string str){return str}
+string calc(string str){
+	return MD5(MD5(str)+MD5("hugo"));
+}
 string trypwd (int k,string hash ,int id){
     int* num = new int[k+1];char* str = new char[k+1] ; str[k] = '\0';
     int n = asciis.size();num[k]=0;num[k-1]=id;str[k-1]=asciis[id];
