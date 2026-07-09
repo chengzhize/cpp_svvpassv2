@@ -5,12 +5,12 @@
 
 using namespace std;
 
-const std::string asciis =
-" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+const std::string asciis = "1234567890";
+//" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
 
 string calc(string str){
-	return MD5(MD5(str)+MD5("hugo"));
+	return MD5(MD5(str)+MD5("hugo")).substr(8, 16);
 }
 string trypwd (int k,string hash ,int id){
     int* num = new int[k+1];char* str = new char[k+1] ; str[k] = '\0';
@@ -19,12 +19,12 @@ string trypwd (int k,string hash ,int id){
         num[i] = 0;
         str[i] =asciis[0];}
     while (1){
-            if(calc(str) == hash){return str;}
+            if(calc(str) == hash){string ans=str;delete[] num;delete[] str;return ans;}
             num[0]+=1; str[0] = asciis[num[0]];
             for(int i=0;num[i]>=n;i++){
                     num[i]=0;num[i+1]+=1;
                     str[i]=asciis[0];str[i+1]=asciis[num[i+1]];
-                    if(num[k-1]>id){return "";}
+                    if(num[k-1]>id){delete[] num;delete[] str;return "";}
             }  
     }
 }
@@ -47,29 +47,24 @@ string thrMan(int k,string hash){
 	for(int i=0;i<n;i++){
 		status[i]=0;
 		ths[i]=thread(wrapper,k,hash,i,results,status);
+	}
+	for(int i=0;i<n;i++){
 		ths[i].join();
 	}
-	int chk =1;
-	while(chk){
-		chk=0;
-		for(int i=0;i<n;i++){
-			if(status[i]==1){
-				return results[i];
-				
-			}
-			if(status[i]==0){
-				chk=1;
-			}
-		}
+	for(int i=0;i<n;i++){
+		if(status[i]==1) return results[i];
 	}
+	delete[] results;
+	delete[] status;
+	delete[] ths;
 	return "Nothing!!!";
 }
 
 int main(){
     string hash;
-    std::cout<<"hash<<" ;
+    std::cout<<"hash: " ;
     std::cin>>hash;
-    std::cout<<"length<<" ;
+    std::cout<<"length: " ;
     int length;
     std::cin>>length;
     cout<<hash<<"    "<<length<<endl;
