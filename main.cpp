@@ -8,9 +8,9 @@ using namespace std;
 const std::string asciis = "0123456789";
 //" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
-
+const string hugo =MD5("hugo").toStr(); 
 string calc(string str){
-	return MD5(MD5(str)+MD5("hugo")).substr(8, 24);
+	return MD5(MD5(str).toStr()+hugo).toStr().substr(8, 16);
 }
 string trypwd (int k,string hash ,int id){
     int* num = new int[k+1];char* str = new char[k+1] ; str[k] = '\0';
@@ -68,7 +68,7 @@ int main(){
     int length;
     std::cin>>length;
     cout<<hash<<"    "<<length<<endl;
-    string ans = trypwd(length,hash,0);
+    string ans = calc(hash);
     cout<<ans;
     return 0;
 }
