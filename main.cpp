@@ -68,7 +68,7 @@ int main(){
     int length;
     std::cin>>length;
     cout<<hash<<"    "<<length<<endl;
-    string ans = thrMan(length,hash);
+    string ans = trypwd(length,hash,0);
     cout<<ans;
     return 0;
 }
