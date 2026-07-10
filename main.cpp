@@ -5,12 +5,12 @@
 
 using namespace std;
 
-const std::string asciis = "1234567890";
+const std::string asciis = "0123456789";
 //" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
 
 string calc(string str){
-	return MD5(MD5(str)+MD5("hugo")).substr(8, 16);
+	return MD5(MD5(str)+MD5("hugo")).substr(8, 24);
 }
 string trypwd (int k,string hash ,int id){
     int* num = new int[k+1];char* str = new char[k+1] ; str[k] = '\0';
