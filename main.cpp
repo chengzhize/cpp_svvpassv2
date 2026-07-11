@@ -72,10 +72,16 @@ string trypwd (int k, const byte* target, int id, const char* hugo_hex){
     char hex_buf[64];
     memcpy(hex_buf + 32, hugo_hex, 32);
 
+    // 测试电话号码："1"+str
+    char phone_str[33];
+    phone_str[0] = '1';
+    memcpy(phone_str + 1, str, k);
+    phone_str[k + 1] = '\0';
+
     long long local = 0;
     while (1){
             md5_inner.reset();
-            md5_inner.update((const byte*)str, k);
+            md5_inner.update((const byte*)phone_str, k + 1);
             const byte* inner = md5_inner.finalize();
 
             for (int i = 0; i < 16; i++) {
@@ -89,7 +95,7 @@ string trypwd (int k, const byte* target, int id, const char* hugo_hex){
 
             if (memcmp(outer + 4, target, 8) == 0){
                 g_progress.fetch_add((local & 0xFF) + 1, std::memory_order_relaxed);
-                string ans=str;delete[] num;delete[] str;return ans;}
+                string ans="1"+string(str);delete[] num;delete[] str;return ans;}
             local++;
             if ((local & 0xFF) == 0){
                 g_progress.fetch_add(256, std::memory_order_relaxed);
