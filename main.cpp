@@ -2,6 +2,8 @@
 #include <iostream>
 #include <cstring>
 #include <cstdio>
+#include <cstdlib>
+#include <fstream>
 #include <thread>
 #include <atomic>
 #include <chrono>
@@ -118,15 +120,37 @@ string thrMan(int k,string hash){
     return "Nothing!!!";
 }
 
-int main(){
+int main(int argc, char* argv[]){
     string hash;
-    std::cout<<"hash: " ;
-    std::cin>>hash;
-    std::cout<<"length: " ;
-    int length;
-    std::cin>>length;
+    int length = 0;
+    string output_file;
+    bool has_hash = false, has_length = false, has_output = false;
+
+    for (int i = 1; i < argc; i++) {
+        if ((!strcmp(argv[i], "-h") || !strcmp(argv[i], "--hash")) && i+1 < argc)
+            { hash = argv[++i]; has_hash = true; }
+        else if ((!strcmp(argv[i], "-l") || !strcmp(argv[i], "--length")) && i+1 < argc)
+            { length = atoi(argv[++i]); has_length = true; }
+        else if ((!strcmp(argv[i], "-o") || !strcmp(argv[i], "--output")) && i+1 < argc)
+            { output_file = argv[++i]; has_output = true; }
+    }
+
+    if (!has_hash) {
+        std::cout<<"hash: " ;
+        std::cin>>hash;
+    }
+    if (!has_length) {
+        std::cout<<"length: " ;
+        std::cin>>length;
+    }
     cout<<hash<<"    "<<length<<endl;
     string ans = thrMan(length,hash);
-    cout<<ans;
+    if (has_output) {
+        ofstream ofs(output_file);
+        ofs << ans;
+        ofs.close();
+    } else {
+        cout<<ans;
+    }
     return 0;
 }
