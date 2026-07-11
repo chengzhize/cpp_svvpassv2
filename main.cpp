@@ -13,13 +13,19 @@ using namespace std;
 const std::string asciis = "0123456789";
 //" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
-const string hugo =MD5("hugo").toStr();
-
 static std::atomic<long long> g_progress{0};
 static std::atomic<bool> g_found{false};
 
-string calc(string str){
-	return MD5(MD5(str).toStr()+hugo).toStr().substr(8, 16);
+static void hex_decode(const char* src, byte* out, int out_len) {
+    auto digit = [](char c) -> byte {
+        if (c >= '0' && c <= '9') return c - '0';
+        if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+        if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+        return 0;
+    };
+    for (int i = 0; i < out_len; i++) {
+        out[i] = (digit(src[i*2]) << 4) | digit(src[i*2+1]);
+    }
 }
 
 void show_progress(long long total) {
@@ -48,20 +54,39 @@ void show_progress(long long total) {
         bar[20] = '\0';
         printf("\rProgress: [%s] %3d%%  %s  %lld/%lld", bar, pct, eta, cur, total);
         fflush(stdout);
-        std::this_thread::sleep_for(std::chrono::seconds(15));
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
     printf("\r%99s\r", "");
 }
 
-string trypwd (int k,string hash ,int id){
+string trypwd (int k, const byte* target, int id, const char* hugo_hex){
     int* num = new int[k+1];char* str = new char[k+1] ; str[k] = '\0';
     int n = asciis.size();num[k]=0;num[k-1]=id;str[k-1]=asciis[id];
     for(int i=0;i<k-1;i++){
         num[i] = 0;
         str[i] =asciis[0];}
+
+    MD5 md5_inner, md5_outer;
+    static const char hex[] = "0123456789abcdef";
+    char hex_buf[64];
+    memcpy(hex_buf + 32, hugo_hex, 32);
+
     long long local = 0;
     while (1){
-            if(calc(str) == hash){
+            md5_inner.reset();
+            md5_inner.update((const byte*)str, k);
+            const byte* inner = md5_inner.finalize();
+
+            for (int i = 0; i < 16; i++) {
+                hex_buf[i*2]   = hex[inner[i] >> 4];
+                hex_buf[i*2+1] = hex[inner[i] & 0xF];
+            }
+
+            md5_outer.reset();
+            md5_outer.update((const byte*)hex_buf, 64);
+            const byte* outer = md5_outer.finalize();
+
+            if (memcmp(outer + 4, target, 8) == 0){
                 g_progress.fetch_add((local & 0xFF) + 1, std::memory_order_relaxed);
                 string ans=str;delete[] num;delete[] str;return ans;}
             local++;
@@ -82,8 +107,8 @@ string trypwd (int k,string hash ,int id){
     }
 }
 
-void wrapper(int k, string hash,int id, string* ptr, int* sta) {
-    string result = trypwd(k,hash,id);
+void wrapper(int k, const byte* target, int id, const char* hugo_hex, string* ptr, int* sta) {
+    string result = trypwd(k, target, id, hugo_hex);
     if(result!=""){
         *(ptr+id)=result;
         *(sta+id)=1;
@@ -99,12 +124,25 @@ string thrMan(int k,string hash){
     for (int i = 0; i < k; i++) total *= n;
     g_progress.store(0, std::memory_order_relaxed);
     g_found.store(false, std::memory_order_relaxed);
+
+    byte target[8];
+    hex_decode(hash.c_str(), target, 8);
+
+    MD5 md5_hugo("hugo");
+    const byte* hugo_raw = md5_hugo.getDigest();
+    static const char hex[] = "0123456789abcdef";
+    char hugo_hex[32];
+    for (int i = 0; i < 16; i++) {
+        hugo_hex[i*2]   = hex[hugo_raw[i] >> 4];
+        hugo_hex[i*2+1] = hex[hugo_raw[i] & 0xF];
+    }
+
     string* results =new string[n];
     int* status = new int[n];
     thread* ths =new thread[n];
     for(int i=0;i<n;i++){
         status[i]=0;
-        ths[i]=thread(wrapper,k,hash,i,results,status);
+        ths[i]=thread(wrapper,k,target,i,hugo_hex,results,status);
     }
     thread monitor(show_progress, total);
     for(int i=0;i<n;i++){

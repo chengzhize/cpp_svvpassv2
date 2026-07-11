@@ -91,6 +91,18 @@ public:
   /* Construct a MD5 object with a string. */
   MD5(const string& message);
 
+  /* Default constructor, no message processed yet. */
+  MD5();
+
+  /* Reset state for reuse. */
+  void reset();
+
+  /* Process data blocks. */
+  void update(const byte* input, size_t len);
+
+  /* Generate md5 digest (no save/restore, one-shot). */
+  const byte* finalize();
+
   /* Generate md5 digest. */
   const byte* getDigest();
 

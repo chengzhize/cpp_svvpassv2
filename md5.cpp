@@ -40,6 +40,75 @@ MD5::MD5(const string& message) {
 }
 
 /**
+ * @Default constructor, initializes state but processes no data.
+ *
+ */
+MD5::MD5() {
+  finished = false;
+  count[0] = count[1] = 0;
+  state[0] = 0x67452301;
+  state[1] = 0xefcdab89;
+  state[2] = 0x98badcfe;
+  state[3] = 0x10325476;
+}
+
+/**
+ * @Reset the MD5 object for reuse.
+ *
+ */
+void MD5::reset() {
+  finished = false;
+  count[0] = count[1] = 0;
+  state[0] = 0x67452301;
+  state[1] = 0xefcdab89;
+  state[2] = 0x98badcfe;
+  state[3] = 0x10325476;
+}
+
+/**
+ * @Process data blocks, updating the context.
+ *
+ * @param {input} the input data.
+ *
+ * @param {len} the number of bytes.
+ *
+ */
+void MD5::update(const byte* input, size_t len) {
+  finished = false;
+  init(input, len);
+}
+
+/**
+ * @Finalize and produce digest (one-shot, no save/restore).
+ *
+ * @return the message-digest.
+ *
+ */
+const byte* MD5::finalize() {
+  if (!finished) {
+    finished = true;
+
+    byte bits[8];
+    bit32 index, padLen;
+
+    /* Save number of bits */
+    encode(count, bits, 8);
+
+    /* Pad out to 56 mod 64. */
+    index = (bit32)((count[0] >> 3) & 0x3f);
+    padLen = (index < 56) ? (56 - index) : (120 - index);
+    init(PADDING, padLen);
+
+    /* Append length (before padding) */
+    init(bits, 8);
+
+    /* Store state in digest */
+    encode(state, digest, 16);
+  }
+  return digest;
+}
+
+/**
  * @Generate md5 digest.
  *
  * @return the message-digest.
