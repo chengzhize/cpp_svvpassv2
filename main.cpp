@@ -10,6 +10,7 @@
 
 using namespace std;
 
+
 const std::string asciis = "0123456789";
 //" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
