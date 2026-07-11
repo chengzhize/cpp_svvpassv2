@@ -46,7 +46,7 @@ void show_progress(long long total) {
         bar[20] = '\0';
         printf("\rProgress: [%s] %3d%%  %s  %lld/%lld", bar, pct, eta, cur, total);
         fflush(stdout);
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::seconds(15));
     }
     printf("\r%99s\r", "");
 }
